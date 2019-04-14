@@ -20,7 +20,11 @@ connection.connect(function(err) {
 function searchProducts() {
     connection.query("SELECT item_id, product_name, price FROM products", function(err, res) {
         for (var i = 0; i < res.length; i++) {
-            console.log(res[i].item_id + " | " + res[i].product_name + " | " + res[i].price);
+            console.log(
+                "ID#: " + res[i].item_id + 
+                "  |  Product Name: " + res[i].product_name + 
+                "  |  Price: " + res[i].price.toFixed(2)
+            );
         }
         console.log("\n-----------------------------------------\n");
     });
@@ -68,7 +72,7 @@ function questions() {
                 console.log("\nYou have ordered " + action.quantity + " of " + chosenItem.product_name + ".\n");
 
                 //then show customer total cost of purchase
-                console.log("Your total is: $" + chosenItem.price * action.quantity);
+                console.log("Your total is: $" + (chosenItem.price * action.quantity).toFixed(2));
                 console.log("\n-----------------------------------------\n");
 
                 //then update SQL database to reflect updated quantity
@@ -80,7 +84,7 @@ function questions() {
                 
             //if not enough, write insufficient quantity, and don't let order go through
             } else {
-                console.log("Insufficient quantity!");
+                console.log("\nInsufficient quantity!");
                 console.log("\n-----------------------------------------\n");
                 orderAgain();
             }
@@ -90,7 +94,7 @@ function questions() {
 }
 
 
-
+//function to order again or end connection
 function orderAgain() {
 
     //prompt users if they want to order again or end
@@ -100,13 +104,16 @@ function orderAgain() {
             type: "list",
             name: "orderOrEnd",
             message: "Would you like to order another item or close application?",
-            choices: ["yes", "no"]
+            choices: ["Order More", "Close Application"]
         },
   
     ]).then(function(response) {
 
-        if (response.orderOrEnd === "yes") {
+        //if order more, run questions functions
+        if (response.orderOrEnd === "Order More") {
             questions();
+
+        //else end connection
         } else {
             connection.end();
         }
