@@ -30,4 +30,6 @@ VALUES (1, "wall clock", "Home & Kitchen", 15.50, 10),
 
 SELECT * FROM products;
 
-UPDATE products SET stock_quantity = 15 WHERE item_id = 2;
+UPDATE products SET stock_quantity = 15 WHERE item_id = 7;
+
+DELETE FROM products WHERE item_id IS NULL;

@@ -41,7 +41,7 @@ function manageOptions() {
                 //list every available item; the item IDs, names, prices, and quantities
                 for (var i = 0; i < res.length; i++) {
                     console.log(
-                        "ID#: " + res[i].item_id + 
+                        "\nID#: " + res[i].item_id + 
                         " |  Product Name: " + res[i].product_name + 
                         " |  Price: " + res[i].price.toFixed(2) + 
                         " |  Quantity: " + res[i].stock_quantity
@@ -54,14 +54,14 @@ function manageOptions() {
 
 
             //if manager chooses View Low Inventory
-            if (action.options == "View Low Inventory") {
+            else if (action.options == "View Low Inventory") {
             
                 //list all items with an inventory count lower than five
                 connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (err, inventory) {
 
                     for(var i = 0; i < inventory.length; i++) {
                         console.log(
-                            "ID#: " + inventory[i].item_id + 
+                            "\nID#: " + inventory[i].item_id + 
                             " |  Product Name: " + inventory[i].product_name + 
                             " |  Price: " + inventory[i].price.toFixed(2) + 
                             " |  Quantity: " + inventory[i].stock_quantity
@@ -78,7 +78,7 @@ function manageOptions() {
 
 
             //if manager chooses Add to Inventory
-            if (action.options == "Add to Inventory") {
+            else if (action.options == "Add to Inventory") {
         
                 addMoreItems();
 
@@ -86,6 +86,9 @@ function manageOptions() {
 
             //if manager chooses Add New Product
             //allow manager to add a new product to store
+            else if (action.options == "Add New Product") {
+                addNewProduct();
+            }
 
             //else close application
             else {
@@ -100,7 +103,6 @@ function manageOptions() {
 //function to add more items
 function addMoreItems() {
 
-connection.query("SELECT * FROM products", function (err, res) { 
 
     //display a prompt that will let the manager add more of any item to the store
     inquirer.prompt([
@@ -116,13 +118,87 @@ connection.query("SELECT * FROM products", function (err, res) {
         }
     ]).then(function(action) {
 
-        //add the quantity given to the item number 
-        connection.query("UPDATE `products` SET `stock_quantity` = " + (action.howMany + res.stock_quantity) + " WHERE `item_id` = " + action.addMore, function(err) {
-            if (err) throw err;
-            orderAgain();
+        //grab columns from the item id manager chose
+        connection.query("SELECT * FROM products WHERE item_id = " + action.addMore, function(err, res) {
+
+            //add value inputted and current quantity in table together to get updated quantity
+            var updatedQuantity = parseInt(action.howMany) + parseInt(res[0].stock_quantity);
+           
+            //add the quantity given to the item number 
+            connection.query("UPDATE products SET stock_quantity = " + updatedQuantity + " WHERE item_id = " + action.addMore, function(err) {
+                if (err) throw err;
+
+                //log the product name and updated quantity to manager
+                console.log("\n" + res[0].product_name + " has been updated to a quantity of " + updatedQuantity + ".\n");
+
+                manageOptions();
+            }); 
+
+        });
+   
+    });
+
+}
+
+//function to add new products
+function addNewProduct() {
+
+    //Ask manager to input the item_id, product_name, department_name, price, and stock_quantity
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "itemId",
+            message: "What is the ID of this item?"
+        },
+        {
+            type: "input",
+            name: "itemName",
+            message: "What is the name of the item?"
+        },
+        {
+            type: "list",
+            name: "itemDepartment",
+            message: "What department is this item in?",
+            choices: [
+                        "Appliances", 
+                        "Books", 
+                        "Beauty & Personal Care",  
+                        "Clothing", 
+                        "Electronics", 
+                        "Home & Kitchen", 
+                        "Office Products", 
+                        "Pet Supplies"
+                    ]
+        },
+        {
+            type: "input",
+            name: "itemPrice",
+            message: "What is the price of this item?"
+        },
+        {
+            type: "input",
+            name: "itemQuantity",
+            message: "How many items are there?"
+        }
+    ]).then(function(answer) {
+
+        //insert new product into products table
+        connection.query(
+            "INSERT INTO products (item_id, product_name, department_name, price, stock_quantity) " + 
+            " VALUES (" + answer.itemId + ", '" + answer.itemName + "', '" + answer.itemDepartment + "', " + answer.itemPrice + ", " + parseInt(answer.itemQuantity) + ")", function(err) {
+                
+                if (err) throw err;
+
+                //log the item name that was inputted into the list of items
+                console.log("\nYou've successfully added " + answer.itemName + " to the list of products.\n");
+
+                console.log("\n-----------------------------------------\n");
+                
+                manageOptions();
+
         });
 
     });
 
-});
 }
+
