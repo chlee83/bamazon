@@ -11,7 +11,12 @@ This first screenshot shows bamazon from what the customers can view and do.
 
 ![GitHub Logo](/images/customer.png)
 
-This second screenshot shows the first set of options the manager can do.
+
+This second screenshot shows the options the manager has.
+![GitHub Logo](/images/manager3.png)
+
+
+This third screenshot shows the first set of options the manager can do.
 This includes:
 * viewing items
 * checking low inventory items
@@ -19,8 +24,7 @@ This includes:
 
 ![GitHub Logo](/images/manager1.png)
 
-This third screenshot shows the last option the mananger can do, which is to add a new product to the table.
+This fourth screenshot shows the last option the mananger can do, which is to add a new product to the table.
 You can see item #15 *mirror* was added to the bottom of the list.
-
 ![GitHub Logo](/images/manager2.png)
 
